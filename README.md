@@ -9,3 +9,5 @@ Directory:
 / is home page (map)
 /admin is admin page
 ```
+
+Project is hosted at: https://austinparkspartnermap.vercel.app/
