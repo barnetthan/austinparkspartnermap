@@ -4,5 +4,8 @@ pnpm i
 pnpm dev
 ```
 
+Directory:
+```
 / is home page (map)
 /admin is admin page
+```
