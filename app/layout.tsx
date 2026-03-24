@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import Link from "next/link";
+import { Suspense } from "react";
+import { Navbar } from "@/components/navbar";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -39,23 +40,12 @@ export default function RootLayout({
               padding: "12px 16px",
             }}
           >
-            <nav
-              style={{
-                display: "flex",
-                gap: 12,
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <Link href="/">Home</Link>
-              <Link href="/admin">Admin</Link>
-              <div style={{ marginLeft: "auto" }} />
-              <Link href="/auth/login">Login</Link>
-            </nav>
+            <Suspense fallback={<div>Loading...</div>}>
+              <Navbar />
+            </Suspense>
           </header>
-          <main style={{ padding: "16px" }}>
-            {children}
-          </main>
+
+          <main style={{ padding: "16px" }}>{children}</main>
         </ThemeProvider>
       </body>
     </html>
