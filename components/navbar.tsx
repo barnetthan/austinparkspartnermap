@@ -16,8 +16,8 @@ export async function Navbar() {
     >
       <Link href="/">Home</Link>
 
-      {isAdmin && <Link href="/add-partner">Add Partner</Link>}
-      {isAdmin && <Link href="/add-admin">Add Admin</Link>}
+      {isAdmin && <Link href="/partners">Partners</Link>}
+      {isAdmin && <Link href="/admins">Admins</Link>}
 
       <div style={{ marginLeft: "auto" }} />
 
