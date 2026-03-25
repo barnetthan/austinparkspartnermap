@@ -1,41 +1,93 @@
-import { createClient } from "@/lib/supabase/server";
 import { Suspense } from "react";
 
-async function PartnersList() {
+import { createClient } from "@/lib/supabase/server";
+import { HomeMap } from "@/components/home-map";
+
+type PartnerRecord = {
+  id?: number | string | null;
+  name?: string | null;
+  description?: string | null;
+  latitude?: number | string | null;
+  longitude?: number | string | null;
+  lat?: number | string | null;
+  lng?: number | string | null;
+  [key: string]: unknown;
+};
+
+type MapPartner = {
+  id: string;
+  name: string;
+  description: string;
+  latitude: number;
+  longitude: number;
+};
+
+function parseCoordinate(value: unknown) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return null;
+}
+
+function normalizePartner(partner: PartnerRecord, index: number): MapPartner | null {
+  const latitude = parseCoordinate(partner.latitude ?? partner.lat);
+  const longitude = parseCoordinate(partner.longitude ?? partner.lng);
+
+  if (latitude === null || longitude === null) {
+    return null;
+  }
+
+  return {
+    id: String(partner.id ?? index),
+    name: typeof partner.name === "string" && partner.name.trim() ? partner.name : "Unnamed partner",
+    description: typeof partner.description === "string" ? partner.description : "",
+    latitude,
+    longitude,
+  };
+}
+
+function HomePageFallback() {
+  return (
+    <main>
+      <section className="rounded-[1.9rem] border border-primary/10 bg-card p-6 text-sm text-muted-foreground shadow-sm">
+        Loading map data...
+      </section>
+    </main>
+  );
+}
+
+async function HomePageContent() {
   const supabase = await createClient();
   const { data: partners, error } = await supabase.from("partners").select("*");
 
-  if (error) {
-    return (
-      <p className="mt-4 text-red-600">Error loading partners: {error.message}</p>
-    );
-  }
-
-  if (!partners || partners.length === 0) {
-    return <p className="mt-4 text-gray-600">No partners found.</p>;
-  }
+  const partnerRecords = (partners ?? []) as PartnerRecord[];
+  const mapPartners = partnerRecords
+    .map((partner, index) => normalizePartner(partner, index))
+    .filter((partner): partner is MapPartner => partner !== null);
 
   return (
-    <div className="mt-4 space-y-3">
-      {partners.map((partner, index) => (
-        <div key={String(partner.id ?? index)} className="rounded border p-3">
-          <pre className="text-sm whitespace-pre-wrap">
-            {JSON.stringify(partner, null, 2)}
-          </pre>
-        </div>
-      ))}
-    </div>
+    <main>
+      <HomeMap
+        partners={mapPartners}
+        hasError={Boolean(error)}
+        hasApiKey={Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)}
+      />
+    </main>
   );
 }
 
 export default function HomePage() {
   return (
-    <main>
-      <h1 className="text-4xl font-bold">Home</h1>
-      <p className="text-lg text-gray-600">Partner data loaded on page load.</p>
-      <Suspense fallback={<p className="mt-4 text-gray-600">Loading partners...</p>}>
-        <PartnersList />
-      </Suspense>
-    </main>
+    <Suspense fallback={<HomePageFallback />}>
+      <HomePageContent />
+    </Suspense>
   );
 }

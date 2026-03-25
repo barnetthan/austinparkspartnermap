@@ -11,8 +11,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "Austin Partners Map",
+  description: "Explore Austin partners and the places they help shape.",
 };
 
 const geistSans = Geist({
@@ -34,18 +34,20 @@ export default function RootLayout({
           defaultTheme="light"
           disableTransitionOnChange
         >
-          <header
-            style={{
-              borderBottom: "1px solid rgba(0,0,0,0.1)",
-              padding: "12px 16px",
-            }}
-          >
-            <Suspense fallback={<div>Loading...</div>}>
-              <Navbar />
-            </Suspense>
-          </header>
+          <div className="relative min-h-screen overflow-hidden">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,rgba(245,232,196,0.9),transparent_70%)]" />
+            <header className="sticky top-0 z-20 border-b border-primary/10 bg-background/90 backdrop-blur">
+              <div className="flex px-3 py-3 sm:px-5 lg:px-7">
+                <Suspense fallback={<div className="text-sm text-muted-foreground">Loading navigation...</div>}>
+                  <Navbar />
+                </Suspense>
+              </div>
+            </header>
 
-          <main style={{ padding: "16px" }}>{children}</main>
+            <main className="relative px-3 py-4 sm:px-5 sm:py-5 lg:px-7 lg:py-6">
+              {children}
+            </main>
+          </div>
         </ThemeProvider>
       </body>
     </html>
