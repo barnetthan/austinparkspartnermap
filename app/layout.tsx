@@ -10,8 +10,8 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "Austin Parks Foundation Partner Map",
+  description: "Partner map and admin portal for Austin Parks Foundation",
 };
 
 const geistSans = Geist({
@@ -33,27 +33,33 @@ export default function RootLayout({
           defaultTheme="light"
           disableTransitionOnChange
         >
-          <header
-            style={{
-              borderBottom: "1px solid rgba(0,0,0,0.1)",
-              padding: "12px 16px",
-            }}
-          >
-            <nav
-              style={{
-                display: "flex",
-                gap: 12,
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <Link href="/">Home</Link>
-              <Link href="/admin">Admin</Link>
-              <div style={{ marginLeft: "auto" }} />
-              <Link href="/auth/login">Login</Link>
+          <header className="border-b bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/75">
+            <nav className="mx-auto flex w-full max-w-6xl items-center gap-4">
+              <Link href="/" className="font-extrabold tracking-wide text-[#0a2b52]">
+                Austin Parks Foundation
+              </Link>
+              <Link
+                href="/"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
+              >
+                Partner Map
+              </Link>
+              <Link
+                href="/admin"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
+              >
+                Admin
+              </Link>
+              <div className="ml-auto" />
+              <Link
+                href="/auth/login"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                Login
+              </Link>
             </nav>
           </header>
-          <main style={{ padding: "16px" }}>
+          <main className="mx-auto w-full max-w-6xl px-4 py-6">
             {children}
           </main>
         </ThemeProvider>
