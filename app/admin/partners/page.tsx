@@ -296,7 +296,7 @@ export default function AdminPartnersPage() {
           <div className="w-full max-w-md rounded-lg border bg-background p-6 shadow-lg">
             <h3 className="text-lg font-semibold">Delete partner?</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Are you sure you want to permanently delete "
+              Are you sure you want to delete "
               {partnerToDelete.name?.trim() || "this partner"}"? This action is permanent and
               cannot be undone.
             </p>
