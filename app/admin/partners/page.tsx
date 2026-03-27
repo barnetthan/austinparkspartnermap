@@ -28,6 +28,7 @@ export default function AdminPartnersPage() {
   const [description, setDescription] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+  const [partnerToDelete, setPartnerToDelete] = useState<PartnerRow | null>(null);
 
   const resetForm = () => {
     setEditingId(null);
@@ -186,7 +187,7 @@ export default function AdminPartnersPage() {
               id="partner-lat"
               value={latitude}
               onChange={(e) => setLatitude(e.target.value)}
-              placeholder="30.2672"
+              placeholder="EX: 30.2672"
               inputMode="decimal"
             />
           </div>
@@ -196,7 +197,7 @@ export default function AdminPartnersPage() {
               id="partner-lng"
               value={longitude}
               onChange={(e) => setLongitude(e.target.value)}
-              placeholder="-97.7431"
+              placeholder="EX: -97.7431"
               inputMode="decimal"
             />
           </div>
@@ -275,7 +276,7 @@ export default function AdminPartnersPage() {
                           type="button"
                           variant="destructive"
                           size="sm"
-                          onClick={() => onDelete(partner.id)}
+                          onClick={() => setPartnerToDelete(partner)}
                           disabled={pending}
                         >
                           Delete
@@ -289,6 +290,40 @@ export default function AdminPartnersPage() {
           </div>
         )}
       </div>
+
+      {partnerToDelete ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-md rounded-lg border bg-background p-6 shadow-lg">
+            <h3 className="text-lg font-semibold">Delete partner?</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Are you sure you want to permanently delete "
+              {partnerToDelete.name?.trim() || "this partner"}"? This action is permanent and
+              cannot be undone.
+            </p>
+            <div className="mt-4 flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setPartnerToDelete(null)}
+                disabled={pending}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                disabled={pending}
+                onClick={async () => {
+                  await onDelete(partnerToDelete.id);
+                  setPartnerToDelete(null);
+                }}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
