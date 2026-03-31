@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import InviteAdminForm from "@/components/InviteAdminForm";
+import { DeleteAdminButton } from "@/components/delete-admin-button";
 
 export default async function AdminAdminsPage() {
   const supabase = await createClient();
@@ -23,7 +24,6 @@ export default async function AdminAdminsPage() {
       <hr className="my-8" />
       {/* 3. THE ADMINS TABLE SECTION */}
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Admin Management</h2>
         <p className="text-sm text-muted-foreground">
           View and manage team members who have access to this dashboard.
         </p>
@@ -56,9 +56,7 @@ export default async function AdminAdminsPage() {
                   </td>
                   <td className="p-4 align-middle text-right">
                     {/* Lauren/Fareedah can add the Delete logic here later */}
-                    <button className="text-red-600 hover:underline text-xs font-semibold">
-                      Remove
-                    </button>
+                      <DeleteAdminButton adminId={admin.id} email={admin.email} />
                   </td>
                 </tr>
               ))}
