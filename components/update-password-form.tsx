@@ -24,23 +24,28 @@ export function UpdatePasswordForm({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
+const handleForgotPassword = async (e: React.FormEvent) => {
+   e.preventDefault();
+  const supabase = createClient();
+  setIsLoading(true);
+  setError(null);
 
-    try {
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push("/protected");
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+  try {
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) throw error;
+
+      await supabase.auth.signOut(); // Sign out the user after password change
+      // ADD THIS: Refresh the server components (Layout, etc.)
+      router.refresh(); 
+
+  // Redirect to the dashboard
+      router.push("/auth/login?message=Password updated, please log in again");
+     } catch (error: unknown) {
+       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
-      setIsLoading(false);
+    setIsLoading(false);
     }
-  };
+   };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

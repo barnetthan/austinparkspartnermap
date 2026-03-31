@@ -1,40 +1,69 @@
 import { createClient } from "@/lib/supabase/server";
+import InviteAdminForm from "@/components/InviteAdminForm";
 
 export default async function AdminAdminsPage() {
   const supabase = await createClient();
-  const { data, error } = await supabase.from("admins").select("*").limit(25);
+  const { data: admins, error } = await supabase.from("admins").select("*").limit(25);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8 p-6">
+      {/* 1. HEADER SECTION */}
       <div>
-        <h2 className="text-xl font-semibold">Admins</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-[#004d44]">Admin Management</h2>
         <p className="text-sm text-muted-foreground">
-          Admin management UI scaffold. Integrate with your final auth flow next.
+          Invite new team members and manage existing permissions.
         </p>
       </div>
 
-      <div className="rounded-lg border p-4">
+      {/* 2. THE INVITE FORM SECTION */}
+      <section className="max-w-md">
+        <InviteAdminForm /> 
+      </section>
+
+      <hr className="my-8" />
+      {/* 3. THE ADMINS TABLE SECTION */}
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight">Admin Management</h2>
+        <p className="text-sm text-muted-foreground">
+          View and manage team members who have access to this dashboard.
+        </p>
+      </div>
+
+      <div className="rounded-md border bg-white">
         {error ? (
-          <p className="text-sm text-muted-foreground">
-            Could not load the `admins` table yet: {error.message}
-          </p>
-        ) : !data || data.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No admins found. Ask backend to create/populate the `admins` table.
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {data.map((admin, index) => (
-              <div
-                key={String(admin.id ?? index)}
-                className="rounded border p-3 text-sm"
-              >
-                <pre className="whitespace-pre-wrap">
-                  {JSON.stringify(admin, null, 2)}
-                </pre>
-              </div>
-            ))}
+          <div className="p-8 text-center text-sm text-red-500">
+            Error loading admins: {error.message}
           </div>
+        ) : !admins || admins.length === 0 ? (
+          <div className="p-8 text-center text-sm text-muted-foreground">
+            No admins found in the system.
+          </div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-muted/50 transition-colors">
+                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Email</th>
+                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Date Joined</th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {admins.map((admin) => (
+                <tr key={admin.id} className="hover:bg-muted/50 transition-colors">
+                  <td className="p-4 align-middle font-medium">{admin.email}</td>
+                  <td className="p-4 align-middle text-muted-foreground">
+                    {new Date(admin.created_at).toLocaleDateString()}
+                  </td>
+                  <td className="p-4 align-middle text-right">
+                    {/* Lauren/Fareedah can add the Delete logic here later */}
+                    <button className="text-red-600 hover:underline text-xs font-semibold">
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>
