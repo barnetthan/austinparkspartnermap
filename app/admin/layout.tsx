@@ -1,10 +1,4 @@
-import Link from "next/link";
-
-const tabs = [
-  { href: "/admin", label: "Overview" },
-  { href: "/admin/partners", label: "Partners" },
-  { href: "/admin/admins", label: "Admins" },
-];
+import { AdminNav } from "@/components/admin-nav";
 
 export default function AdminLayout({
   children,
@@ -19,17 +13,7 @@ export default function AdminLayout({
           Manage partner organizations and admin access.
         </p>
       </div>
-      <nav className="flex flex-wrap gap-2">
-        {tabs.map((tab) => (
-          <Link
-            key={tab.href}
-            href={tab.href}
-            className="rounded-md border px-3 py-1.5 text-sm hover:bg-muted"
-          >
-            {tab.label}
-          </Link>
-        ))}
-      </nav>
+      <AdminNav />
       <div className="rounded-lg border bg-card p-4 shadow-sm">
       {children}
       </div>
