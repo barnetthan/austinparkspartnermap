@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import HomeMap from "@/components/home-map";
 import Link from "next/link";
 import { Suspense } from "react";
+
 type Partner = {
   id: string | number;
   name: string | null;
@@ -12,6 +13,11 @@ type Partner = {
 
 async function HomePageContent() {
   const supabase = await createClient();
+  
+  // 1. Get the current user session to determine if we show admin buttons
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // 2. Fetch partner data for the map and list
   const { data, error } = await supabase.from("partners").select("*");
   const partners = (data ?? []) as Partner[];
 
@@ -31,6 +37,7 @@ async function HomePageContent() {
 
   return (
     <div className="space-y-8">
+      {/* Hero Section */}
       <section className="overflow-hidden rounded-2xl border">
         <div className="bg-gradient-to-r from-[#0a2b52] via-[#0c3a66] to-[#164d80] px-8 py-16 text-white">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">
@@ -43,23 +50,28 @@ async function HomePageContent() {
             Discover organizations supporting Austin parks, trails, and green
             spaces. Click a marker to explore partner details.
           </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href="/admin/partners"
-              className="rounded-md bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
-            >
-              Manage partners
-            </Link>
-            <Link
-              href="/admin"
-              className="rounded-md border border-white/40 bg-white/10 px-5 py-2 text-sm font-semibold text-white hover:bg-white/20"
-            >
-              Open admin portal
-            </Link>
-          </div>
+
+          {/* 3. Conditional Rendering: Only show buttons if a user is logged in */}
+          {user && (
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                href="/admin/partners"
+                className="rounded-md bg-white px-5 py-2 text-sm font-semibold text-[#0a2b52] hover:bg-slate-100"
+              >
+                Manage partners
+              </Link>
+              <Link
+                href="/admin"
+                className="rounded-md border border-white/40 bg-white/10 px-5 py-2 text-sm font-semibold text-white hover:bg-white/20"
+              >
+                Open admin portal
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
+      {/* Map Section */}
       <section className="rounded-xl border bg-card p-5">
         <div className="mb-4">
           <h2 className="text-2xl font-bold">Partner Locations</h2>
@@ -78,6 +90,7 @@ async function HomePageContent() {
         ) : null}
       </section>
 
+      {/* Partners List Section */}
       <section className="rounded-xl border p-6">
         <h2 className="text-2xl font-bold">Current Partners</h2>
         <p className="mt-1 text-sm text-muted-foreground">

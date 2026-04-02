@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Added useEffect
 
 export function UpdatePasswordForm({
   className,
@@ -23,18 +23,36 @@ export function UpdatePasswordForm({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const supabase = createClient();
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
+  // 1. CLEAR SESSION ON LOAD
+  // This prevents "OG Admin" from accidentally resetting their own 
+  // password when clicking a link meant for a new admin.
+  useEffect(() => {
+    const clearSession = async () => {
+      await supabase.auth.signOut();
+    };
+    clearSession();
+  }, [supabase]);
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
     try {
+      // 2. Perform the password update
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      router.push("/protected");
+
+      // 3. Log out one last time to ensure the new password is required
+      await supabase.auth.signOut(); 
+      
+      // 4. Force a refresh so the Navbar/Layout sees the logout
+      router.refresh(); 
+
+      // 5. Redirect with a success message
+      router.push("/auth/login?message=Password updated successfully. Please log in.");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
@@ -52,22 +70,22 @@ export function UpdatePasswordForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleForgotPassword}>
+          <form onSubmit={handleUpdatePassword}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="password">New password</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="New password"
+                  placeholder="Enter at least 6 characters"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {error && <p className="text-sm text-red-500 font-medium">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save new password"}
+                {isLoading ? "Updating..." : "Save new password"}
               </Button>
             </div>
           </form>

@@ -3,20 +3,31 @@ import { createClient } from "@/lib/supabase/server";
 
 export default async function AdminPage() {
   const supabase = await createClient();
+
+  // 1. Fetch count for Partners
   const { count: partnerCount } = await supabase
     .from("partners")
+    .select("*", { count: "exact", head: true });
+
+  // 2. Fetch count for Admins
+  const { count: adminCount } = await supabase
+    .from("admins")
     .select("*", { count: "exact", head: true });
 
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2">
+        {/* Partners Stats Card */}
         <div className="rounded-lg border p-4">
           <p className="text-sm text-muted-foreground">Total Partners</p>
           <p className="mt-1 text-3xl font-semibold">{partnerCount ?? 0}</p>
         </div>
+
+        {/* Admins Stats Card */}
         <div className="rounded-lg border p-4">
           <p className="text-sm text-muted-foreground">Admin Accounts</p>
-          <p className="mt-1 text-3xl font-semibold">Pending setup</p>
+          {/* Swapped "Pending setup" for the actual count */}
+          <p className="mt-1 text-3xl font-semibold">{adminCount ?? 0}</p>
         </div>
       </div>
 

@@ -38,7 +38,9 @@ export function LoginForm({
         password,
       });
       if (error) throw error;
-      router.push("/admin");
+      
+      router.refresh(); // Refresh to update auth state in server components
+      router.push("/");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
