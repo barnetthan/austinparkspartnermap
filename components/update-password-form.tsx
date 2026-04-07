@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react"; // Added useEffect
+import { useState, useEffect } from "react";
 
 export function UpdatePasswordForm({
   className,
@@ -25,15 +25,20 @@ export function UpdatePasswordForm({
   const router = useRouter();
   const supabase = createClient();
 
-  // 1. CLEAR SESSION ON LOAD
-  // This prevents "OG Admin" from accidentally resetting their own 
-  // password when clicking a link meant for a new admin.
   useEffect(() => {
-    const clearSession = async () => {
-      await supabase.auth.signOut();
-    };
-    clearSession();
-  }, [supabase]);
+      const verifySession = async () => {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error || !session) {
+          console.error("No session found after callback. Link may be expired.");
+          setError("Your reset link has expired or is invalid. Please request a new one.");
+        } else {
+          console.log("Session verified for:", session.user.email);
+        }
+      };
+
+      verifySession();
+    }, [supabase]);
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,17 +46,17 @@ export function UpdatePasswordForm({
     setError(null);
 
     try {
-      // 2. Perform the password update
+      // 1. Update the password for the recognized recovery user
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
 
-      // 3. Log out one last time to ensure the new password is required
+      // 2. Clear the temporary recovery session so they must log in fresh
       await supabase.auth.signOut(); 
       
-      // 4. Force a refresh so the Navbar/Layout sees the logout
+      // 3. Refresh server components (like the Navbar) to show 'Logged Out' state
       router.refresh(); 
 
-      // 5. Redirect with a success message
+      // 4. Redirect to login with a success message
       router.push("/auth/login?message=Password updated successfully. Please log in.");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
@@ -66,7 +71,7 @@ export function UpdatePasswordForm({
         <CardHeader>
           <CardTitle className="text-2xl">Reset Your Password</CardTitle>
           <CardDescription>
-            Please enter your new password below.
+            Please enter your new password below to regain access.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -77,15 +82,19 @@ export function UpdatePasswordForm({
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter at least 6 characters"
+                  placeholder="Minimum 6 characters"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              {error && <p className="text-sm text-red-500 font-medium">{error}</p>}
+              {error && (
+                <p className="text-sm font-medium text-red-500 text-center">
+                  {error}
+                </p>
+              )}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Updating..." : "Save new password"}
+                {isLoading ? "Saving..." : "Save new password"}
               </Button>
             </div>
           </form>
