@@ -44,7 +44,7 @@ export default async function AdminAdminsPage() {
               <tr className="border-b bg-muted/50 transition-colors">
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Email</th>
                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Date Joined</th>
-                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
+                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -54,7 +54,7 @@ export default async function AdminAdminsPage() {
                   <td className="p-4 align-middle text-muted-foreground">
                     {new Date(admin.created_at).toLocaleDateString()}
                   </td>
-                  <td className="p-4 align-middle">
+                  <td className="p-4 align-middle text-right">
                     {/* Lauren/Fareedah can add the Delete logic here later */}
                       <DeleteAdminButton adminId={admin.id} email={admin.email} />
                   </td>
