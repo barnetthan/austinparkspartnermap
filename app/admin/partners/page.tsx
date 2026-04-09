@@ -113,7 +113,9 @@ export default function AdminPartnersPage() {
 
     setStatus({
       ok: true,
-      message: editingId ? "Partner updated." : "Partner added.",
+      message: editingId
+        ? `"${payload.name}" was updated.`
+        : `"${payload.name}" was added as a partner.`,
     });
     resetForm();
     await loadPartners();
@@ -133,7 +135,7 @@ export default function AdminPartnersPage() {
     setStatus(null);
   };
 
-  const onDelete = async (partnerId: string | number) => {
+  const onDelete = async (partnerId: string | number, partnerName?: string | null) => {
     setPending(true);
     setStatus(null);
     const { error } = await supabase.from("partners").delete().eq("id", partnerId);
@@ -143,7 +145,10 @@ export default function AdminPartnersPage() {
       return;
     }
     if (editingId === partnerId) resetForm();
-    setStatus({ ok: true, message: "Partner deleted." });
+    setStatus({
+      ok: true,
+      message: `${partnerName?.trim() || "Partner"} was deleted.`,
+    });
     await loadPartners();
     setPending(false);
   };
@@ -203,15 +208,6 @@ export default function AdminPartnersPage() {
           </div>
         </div>
 
-        {status ? (
-          <p
-            className={`text-sm ${status.ok ? "text-green-700" : "text-red-600"}`}
-            role="status"
-          >
-            {status.message}
-          </p>
-        ) : null}
-
         <div className="flex flex-wrap gap-2">
           <Button type="submit" disabled={pending}>
             {pending
@@ -231,6 +227,15 @@ export default function AdminPartnersPage() {
             </Button>
           ) : null}
         </div>
+
+        {status ? (
+          <p
+            className={`text-sm font-semibold ${status.ok ? "text-green-700" : "text-red-600"}`}
+            role="status"
+          >
+            {status.message}
+          </p>
+        ) : null}
       </form>
 
       <div className="space-y-3">
@@ -314,7 +319,7 @@ export default function AdminPartnersPage() {
                 variant="destructive"
                 disabled={pending}
                 onClick={async () => {
-                  await onDelete(partnerToDelete.id);
+                  await onDelete(partnerToDelete.id, partnerToDelete.name);
                   setPartnerToDelete(null);
                 }}
               >

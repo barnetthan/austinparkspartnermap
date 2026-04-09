@@ -29,10 +29,13 @@ export async function POST(req: Request) {
     // 3. Insert into your 'admins' table so they appear in your dashboard
     const { error: dbError } = await supabaseAdmin
       .from('admins')
-      .insert([{ 
-        id: authData.user.id, 
-        email: email 
-      }])
+      .upsert(
+        [{
+          id: authData.user.id,
+          email,
+        }],
+        { onConflict: 'id' }
+      )
 
     if (dbError) throw dbError
 

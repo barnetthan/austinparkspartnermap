@@ -1,13 +1,25 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function InviteAdminForm() {
+type Status = {
+  ok: boolean;
+  message: string;
+};
+
+export default function InviteAdminForm({
+  onStatusChange,
+}: {
+  onStatusChange: (status: Status | null) => void;
+}) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    onStatusChange(null);
 
     const res = await fetch("/api/add-admin", {
       method: "POST",
@@ -18,10 +30,17 @@ export default function InviteAdminForm() {
     const result = await res.json();
 
     if (res.ok) {
-      alert(`An invitation email has been sent to ${email}!`);
+      onStatusChange({
+        ok: true,
+        message: `Invitation sent to ${email}.`,
+      });
       setEmail("");
+      router.refresh();
     } else {
-      alert(`Error: ${result.error}`);
+      onStatusChange({
+        ok: false,
+        message: result.error ?? "Failed to add admin.",
+      });
     }
     setLoading(false);
   };

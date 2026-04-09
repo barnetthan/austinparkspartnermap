@@ -1,35 +1,89 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { deleteAdmin } from "@/app/admin/admins/action";
+import { Button } from "@/components/ui/button";
 
-export function DeleteAdminButton({ adminId, email }: { adminId: string, email: string }) {
-  const [isDeleting, setIsDeleting] = useState(false);
+type Status = {
+  ok: boolean;
+  message: string;
+};
 
-  const handleDelete = async () => {
-    const confirmed = window.confirm(
-      `Are you sure you want to remove ${email}? This will revoke their access immediately.`
-    );
+export function DeleteAdminButton({
+  adminId,
+  email,
+  onStatusChange,
+}: {
+  adminId: string;
+  email: string;
+  onStatusChange: (status: Status | null) => void;
+}) {
+  const [isRemoving, setIsRemoving] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const router = useRouter();
 
-    if (!confirmed) return;
-
-    setIsDeleting(true);
+  const handleRemove = async () => {
+    setIsRemoving(true);
+    onStatusChange(null);
     try {
       await deleteAdmin(adminId);
+      onStatusChange({
+        ok: true,
+        message: `${email} was removed as an admin.`,
+      });
+      setShowConfirm(false);
+      router.refresh();
     } catch (err: any) {
-      alert(err.message || "Failed to delete admin");
+      setShowConfirm(false);
+      onStatusChange({
+        ok: false,
+        message: err.message || "Failed to remove admin.",
+      });
     } finally {
-      setIsDeleting(false);
+      setIsRemoving(false);
     }
   };
 
   return (
-    <button
-      onClick={handleDelete}
-      disabled={isDeleting}
-      className="text-red-600 hover:underline text-xs font-semibold disabled:opacity-50"
-    >
-      {isDeleting ? "Removing..." : "Remove"}
-    </button>
+    <>
+      <button
+        onClick={() => setShowConfirm(true)}
+        disabled={isRemoving}
+        className="text-red-600 hover:underline text-xs font-semibold disabled:opacity-50"
+      >
+        {isRemoving ? "Removing..." : "Remove"}
+      </button>
+
+      {showConfirm ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-md rounded-lg border bg-background p-6 shadow-lg">
+            <h3 className="text-lg font-semibold">Remove admin?</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Are you sure you want to remove "{email}" as an admin? This will
+              revoke their access immediately.
+            </p>
+            <div className="mt-4 flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowConfirm(false)}
+                disabled={isRemoving}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                disabled={isRemoving}
+                onClick={handleRemove}
+              >
+                {isRemoving ? "Removing..." : "Remove"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }
