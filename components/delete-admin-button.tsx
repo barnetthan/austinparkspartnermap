@@ -35,6 +35,7 @@ export function DeleteAdminButton({
       setShowConfirm(false);
       router.refresh();
     } catch (err: any) {
+      setShowConfirm(false);
       onStatusChange({
         ok: false,
         message: err.message || "Failed to remove admin.",
