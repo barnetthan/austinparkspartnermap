@@ -93,7 +93,7 @@ export function ForgotPasswordForm({
                   href="/auth/login"
                   className="underline underline-offset-4"
                 >
-                  Login
+                  Admin Login
                 </Link>
               </div>
             </form>
