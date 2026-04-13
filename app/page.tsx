@@ -9,13 +9,16 @@ type Partner = {
   description: string | null;
   latitude: number | null;
   longitude: number | null;
+  display_order: number;
 };
 
 async function HomePageContent() {
   const supabase = await createClient();
   
   // 1. Get the current user session to determine if we show admin buttons
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   // 2. Fetch partner data for the map and list
   const { data, error } = await supabase.from("partners").select("*");
@@ -33,6 +36,7 @@ async function HomePageContent() {
       description: partner.description,
       latitude: partner.latitude as number,
       longitude: partner.longitude as number,
+      display_order: partner.display_order as number,
     }));
 
   return (
@@ -106,25 +110,27 @@ async function HomePageContent() {
           </p>
         ) : (
           <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {partners.map((partner, index) => (
-              <div
-                key={String(partner.id ?? index)}
-                className="rounded-lg border bg-muted/20 p-4"
-              >
-                <h3 className="font-semibold uppercase tracking-wide text-[#0a2b52]">
-                  {partner.name ?? "Untitled partner"}
-                </h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {partner.description ?? "No description provided."}
-                </p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {typeof partner.latitude === "number" &&
-                  typeof partner.longitude === "number"
-                    ? `Coordinates: ${partner.latitude}, ${partner.longitude}`
-                    : "Coordinates pending"}
-                </p>
-              </div>
-            ))}
+            {partners
+              .sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+              .map((partner, index) => (
+                <div
+                  key={String(partner.id ?? index)}
+                  className="rounded-lg border bg-muted/20 p-4"
+                >
+                  <h3 className="font-semibold uppercase tracking-wide text-[#0a2b52]">
+                    {partner.name ?? "Untitled partner"}
+                  </h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {partner.description ?? "No description provided."}
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {typeof partner.latitude === "number" &&
+                    typeof partner.longitude === "number"
+                      ? `Coordinates: ${partner.latitude}, ${partner.longitude}`
+                      : "Coordinates pending"}
+                  </p>
+                </div>
+              ))}
           </div>
         )}
       </section>

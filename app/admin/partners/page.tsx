@@ -12,6 +12,7 @@ type PartnerRow = {
   description: string | null;
   latitude: number | null;
   longitude: number | null;
+  display_order: number;
 };
 
 type Status = { ok: boolean; message: string } | null;
@@ -38,16 +39,61 @@ export default function AdminPartnersPage() {
     setLongitude("");
   };
 
+  const minOrder = partners.length > 0 
+    ? Math.min(...partners.map(p => p.display_order ?? 0)) 
+    : 0;
+
+  const maxOrder = partners.length > 0 
+    ? Math.max(...partners.map(p => p.display_order ?? 0)) 
+    : 0;
+
   const loadPartners = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("partners").select("*");
+    const { data, error } = await supabase
+      .from("partners")
+      .select("*")
+      .order("display_order", { ascending: true });
+    
     if (error) {
       setStatus({ ok: false, message: error.message });
       setLoading(false);
       return;
+    } else {
+      setPartners((data ?? []) as PartnerRow[]);
     }
-    setPartners((data ?? []) as PartnerRow[]);
     setLoading(false);
+  };
+
+  const movePartner = async (currentIndex: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= partners.length) return;
+  
+    const currentPartner = partners[currentIndex];
+    const targetPartner = partners[targetIndex];
+  
+    const updatedCurrent = { 
+      ...currentPartner, 
+      display_order: targetPartner.display_order 
+    };
+    const updatedTarget = { 
+      ...targetPartner, 
+      display_order: currentPartner.display_order 
+    };
+  
+    const newPartners = [...partners];
+    newPartners[currentIndex] = updatedTarget;
+    newPartners[targetIndex] = updatedCurrent;
+    
+    setPartners(newPartners);
+  
+    const { error } = await supabase
+      .from("partners")
+      .upsert([updatedCurrent, updatedTarget], { onConflict: 'id' });
+  
+    if (error) {
+      setStatus({ ok: false, message: "Failed to save order." });
+      await loadPartners();
+    }
   };
 
   useEffect(() => {
@@ -91,12 +137,15 @@ export default function AdminPartnersPage() {
       setPending(false);
       return;
     }
+    const nextOrder = partners.length > 0 
+      ? Math.max(...partners.map(p => p.display_order ?? 0)) + 1 : 0;
 
     const payload = {
       name: name.trim(),
       description: description.trim() || null,
       latitude: parsedLat,
       longitude: parsedLng,
+      display_order: nextOrder,
     };
 
     const query = editingId
@@ -253,10 +302,11 @@ export default function AdminPartnersPage() {
                   <th className="px-3 py-2 font-medium">Description</th>
                   <th className="px-3 py-2 font-medium">Coordinates</th>
                   <th className="px-3 py-2 font-medium">Actions</th>
+                  <th className="px-3 py-2 font-medium">Order</th>
                 </tr>
               </thead>
               <tbody>
-                {partners.map((partner) => (
+                {partners.map((partner, index) => (
                   <tr key={String(partner.id)} className="border-t">
                     <td className="px-3 py-2">{partner.name ?? "-"}</td>
                     <td className="px-3 py-2">{partner.description ?? "-"}</td>
@@ -285,6 +335,28 @@ export default function AdminPartnersPage() {
                           disabled={pending}
                         >
                           Delete
+                        </Button>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => movePartner(index, 'up')}
+                          disabled={pending || partner.display_order === minOrder}
+                        >
+                          ↑
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => movePartner(index, 'down')}
+                          disabled={pending || partner.display_order === maxOrder}
+                        >
+                          ↓
                         </Button>
                       </div>
                     </td>

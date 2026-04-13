@@ -8,6 +8,7 @@ type PartnerLocation = {
   description: string | null;
   latitude: number;
   longitude: number;
+  display_order: number;
 };
 
 const defaultCenter: [number, number] = [30.2672, -97.7431];
@@ -52,7 +53,7 @@ export default function HomeMap({ partners }: { partners: PartnerLocation[] }) {
           </p>
         ) : (
           <div className="space-y-2">
-            {partners.map((partner) => {
+            {partners.sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0)).map((partner) => {
               const isActive = partner.id === selectedId;
               return (
                 <button
