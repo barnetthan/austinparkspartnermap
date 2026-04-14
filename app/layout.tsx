@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { createClient } from "@/lib/supabase/server";
-import { Navbar } from "@/components/navbar"; // We will create this next
+import { Navbar } from "@/components/navbar";
 import "./globals.css";
 
+// Use the live site address in production and localhost while developing.
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
@@ -26,7 +27,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // 1. Get initial user state on the server for SEO and fast loading
+  // Check whether someone is signed in before the page loads.
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -39,7 +40,7 @@ export default async function RootLayout({
           disableTransitionOnChange
           enableSystem
         >
-          {/* 2. Pass the initial user to the Client Navbar */}
+          {/* Send the signed-in user to the navigation bar. */}
           <Navbar initialUser={user} />
 
           <main style={{ padding: "16px" }}>

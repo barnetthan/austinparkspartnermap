@@ -12,15 +12,18 @@ export default function InviteAdminForm({
 }: {
   onStatusChange: (status: Status | null) => void;
 }) {
+  // Keep the email address here until the invite is sent.
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Clear the old message before sending a new invite.
     setLoading(true);
     onStatusChange(null);
 
+    // Call the server route that sends the invite email.
     const res = await fetch("/api/add-admin", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -49,7 +52,9 @@ export default function InviteAdminForm({
     <form onSubmit={handleInvite} className="p-4 border rounded-lg bg-white shadow-sm space-y-4 max-w-md">
       <div>
         <h3 className="font-bold text-lg text-green-900">Invite New Admin</h3>
-        <p className="text-xs text-gray-500">They will receive an email to set their own password.</p>
+        <p className="text-xs text-gray-500">
+          They will receive an email to set their own password.
+        </p>
       </div>
       
       <div>
@@ -64,8 +69,8 @@ export default function InviteAdminForm({
         />
       </div>
 
-      <button 
-        type="submit" 
+      <button
+        type="submit"
         disabled={loading}
         className="w-full bg-green-800 text-white px-4 py-2 rounded font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors"
       >

@@ -21,6 +21,7 @@ export function SignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  // Keep the sign-up values in the form until the user submits them.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
@@ -30,6 +31,7 @@ export function SignUpForm({
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Create the Supabase client when the form is submitted.
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
@@ -45,6 +47,7 @@ export function SignUpForm({
         email,
         password,
         options: {
+          // Send the user back into the app after they confirm their email.
           emailRedirectTo: `${window.location.origin}/protected`,
         },
       });

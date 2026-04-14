@@ -2,12 +2,14 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  // Start with a normal response so Supabase can update cookies.
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   })
 
+  // Refresh the login session on each request.
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
@@ -31,7 +33,7 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // This refreshes the session if it's expired
+  // Checking the current user helps keep the session alive.
   await supabase.auth.getUser()
 
   return response

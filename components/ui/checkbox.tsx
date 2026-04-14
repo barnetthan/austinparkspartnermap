@@ -6,6 +6,7 @@ import { Check } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+// Checkbox with a visible checkmark for simple yes/no steps.
 const Checkbox = React.forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>

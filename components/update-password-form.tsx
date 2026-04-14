@@ -19,12 +19,14 @@ export function UpdatePasswordForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  // Keep the new password in the form until the user clicks save.
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
+  // Make sure the reset link is still good before showing the form.
   useEffect(() => {
       const verifySession = async () => {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -46,17 +48,17 @@ export function UpdatePasswordForm({
     setError(null);
 
     try {
-      // 1. Update the password for the recognized recovery user
+      // Save the new password for this account.
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
 
-      // 2. Clear the temporary recovery session so they must log in fresh
-      await supabase.auth.signOut(); 
-      
-      // 3. Refresh server components (like the Navbar) to show 'Logged Out' state
-      router.refresh(); 
+      // Sign the person out so they log in again with the new password.
+      await supabase.auth.signOut();
 
-      // 4. Redirect to login with a success message
+      // Refresh the page pieces that show sign-in status.
+      router.refresh();
+
+      // Send the user back to the login page with a success note.
       router.push("/auth/login?message=Password updated successfully. Please log in.");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");

@@ -34,6 +34,7 @@ const buttonVariants = cva(
   },
 );
 
+// Shared button used everywhere the app needs a consistent clickable action.
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {

@@ -16,17 +16,20 @@ type Props = { partners: PartnerLocation[] };
 const defaultCenter: [number, number] = [30.2672, -97.7431];
 
 export default function PartnersMap({ partners }: Props) {
+  // Wait until the page loads in the browser before showing the map.
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
+  // Start the map at the first partner, or Austin if there are no partners yet.
   const center: [number, number] =
     partners.length > 0
       ? [partners[0].latitude, partners[0].longitude]
       : defaultCenter;
 
+  // Show a loading message until the map is ready.
   if (!isMounted) {
     return (
       <div className="flex h-[430px] w-full items-center justify-center bg-muted/30 text-sm text-muted-foreground">
@@ -37,6 +40,7 @@ export default function PartnersMap({ partners }: Props) {
 
   return (
     <MapContainer
+      // Give the map a fresh start when the partner list changes.
       key={partners.length === 0 ? "empty-map" : `map-${partners[0].id}`}
       center={center}
       zoom={11}

@@ -23,6 +23,7 @@ const badgeVariants = cva(
   },
 );
 
+// Small label-style chip used for short status messages.
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof badgeVariants> {}

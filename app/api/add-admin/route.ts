@@ -5,7 +5,7 @@ export async function POST(req: Request) {
   try {
     const { email } = await req.json()
 
-    // 1. Initialize with SERVICE_ROLE_KEY
+    // Use the service key because this route creates admin users.
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -17,16 +17,15 @@ export async function POST(req: Request) {
       }
     )
 
-    // 2. The "All-in-One" Invite
-    // This creates the user AND sends the 'User Invite' email template.
+    // Create the new admin account and send the invite email.
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-      // CRITICAL: Point this to your callback, NOT the form directly
+      // Send the user through the callback route so the app can sign them in.
       redirectTo: `http://localhost:3000/auth/callback?next=/auth/update-password`,
     })
 
     if (authError) throw authError
 
-    // 3. Insert into your 'admins' table so they appear in your dashboard
+    // Save the new admin in the admin list too.
     const { error: dbError } = await supabaseAdmin
       .from('admins')
       .upsert(

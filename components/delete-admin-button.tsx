@@ -19,11 +19,14 @@ export function DeleteAdminButton({
   email: string;
   onStatusChange: (status: Status | null) => void;
 }) {
+  // Track whether the remove action is already running.
   const [isRemoving, setIsRemoving] = useState(false);
+  // Ask for confirmation before removing an admin.
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
 
   const handleRemove = async () => {
+    // This removes the user's login access and their admin record.
     setIsRemoving(true);
     onStatusChange(null);
     try {

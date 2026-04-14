@@ -22,6 +22,7 @@ export default function AdminManagement({
   admins: AdminRow[] | null;
   error: string | null;
 }) {
+  // Show messages from invite and delete actions in one spot.
   const [status, setStatus] = useState<Status>(null);
 
   return (
@@ -36,6 +37,7 @@ export default function AdminManagement({
       </div>
 
       <section className="max-w-md">
+        {/* Form for inviting a new admin. */}
         <InviteAdminForm onStatusChange={setStatus} />
       </section>
 
@@ -56,6 +58,7 @@ export default function AdminManagement({
       </div>
 
       <div className="rounded-md border bg-white">
+        {/* Show an error, an empty state, or the admin list. */}
         {error ? (
           <div className="p-8 text-center text-sm text-red-500">
             Error loading admins: {error}

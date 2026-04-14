@@ -8,9 +8,10 @@ export function LogoutButton() {
   const router = useRouter();
 
   const logout = async () => {
+    // Log the user out, then refresh the page.
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.refresh(); // Refresh to update auth state in server components
+    router.refresh();
     router.push("/");
   };
 

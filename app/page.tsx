@@ -12,18 +12,20 @@ type Partner = {
   display_order: number;
 };
 
+// Load the partner list and current sign-in state before showing the home page.
 async function HomePageContent() {
   const supabase = await createClient();
-  
-  // 1. Get the current user session to determine if we show admin buttons
+
+  // If someone is signed in, show the admin shortcuts near the top.
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // 2. Fetch partner data for the map and list
+  // Get all partner records so the map and list show the same information.
   const { data, error } = await supabase.from("partners").select("*");
   const partners = (data ?? []) as Partner[];
 
+  // Only partners with coordinates can appear on the map.
   const mappedPartners = partners
     .filter(
       (partner) =>
@@ -41,7 +43,7 @@ async function HomePageContent() {
 
   return (
     <div className="space-y-8">
-      {/* Hero Section */}
+      {/* Top section with the page title and admin shortcuts. */}
       <section className="overflow-hidden rounded-2xl border">
         <div className="bg-gradient-to-r from-[#0a2b52] via-[#0c3a66] to-[#164d80] px-8 py-16 text-white">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">
@@ -55,7 +57,7 @@ async function HomePageContent() {
             spaces. Click a marker to explore partner details.
           </p>
 
-          {/* 3. Conditional Rendering: Only show buttons if a user is logged in */}
+          {/* Only show the management buttons when someone is signed in. */}
           {user && (
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
@@ -75,7 +77,7 @@ async function HomePageContent() {
         </div>
       </section>
 
-      {/* Map Section */}
+      {/* Map section showing partner locations. */}
       <section className="rounded-xl border bg-card p-5">
         <div className="mb-4">
           <h2 className="text-2xl font-bold">Partner Locations</h2>
@@ -94,7 +96,7 @@ async function HomePageContent() {
         ) : null}
       </section>
 
-      {/* Partners List Section */}
+      {/* Text list of the same partner data shown on the map. */}
       <section className="rounded-xl border p-6">
         <h2 className="text-2xl font-bold">Current Partners</h2>
         <p className="mt-1 text-sm text-muted-foreground">

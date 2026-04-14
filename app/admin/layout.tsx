@@ -7,6 +7,7 @@ export default function AdminLayout({
 }) {
   return (
     <section className="space-y-4">
+      {/* The admin area starts with a title and shared navigation. */}
       <div>
         <h1 className="text-2xl font-semibold">Admin Portal</h1>
         <p className="text-sm text-muted-foreground">
@@ -15,7 +16,7 @@ export default function AdminLayout({
       </div>
       <AdminNav />
       <div className="rounded-lg border bg-card p-4 shadow-sm">
-      {children}
+        {children}
       </div>
     </section>
   );

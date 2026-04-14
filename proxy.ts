@@ -2,6 +2,7 @@ import { updateSession } from "@/lib/supabase/proxy";
 import { type NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
+  // Delegate to the shared session refresh logic used by middleware.
   return await updateSession(request);
 }
 

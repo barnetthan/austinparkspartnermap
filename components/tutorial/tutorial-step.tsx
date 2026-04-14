@@ -9,6 +9,7 @@ export function TutorialStep({
 }) {
   return (
     <li className="relative">
+      {/* Checkbox for marking a step as done. */}
       <Checkbox
         id={title}
         name={title}

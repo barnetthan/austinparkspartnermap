@@ -4,10 +4,12 @@ import { createClient } from "@/lib/supabase/client";
 import { PasswordInput } from "@/components/ui/password-input";
 
 export default function ConfirmAccount() {
-const [password, setPassword] = useState("");
+  // Let the invited admin choose a password before signing in.
+  const [password, setPassword] = useState("");
   const supabase = createClient(); 
   
   const handleSetPassword = async (e: React.FormEvent) => {
+    // Save the new password for the current login session.
     const { error } = await supabase.auth.updateUser({ password });
     
     if (error) alert(error.message);

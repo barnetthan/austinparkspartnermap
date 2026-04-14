@@ -16,7 +16,7 @@ const ThemeSwitcher = () => {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
 
-  // useEffect only runs on the client, so now we can safely show the UI
+  // Wait until the page loads before showing the theme switch.
   useEffect(() => {
     setMounted(true);
   }, []);

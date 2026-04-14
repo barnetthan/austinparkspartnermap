@@ -7,8 +7,10 @@ import { cookies } from "next/headers";
  * it.
  */
 export async function createClient(useServiceRole = false) {
+  // Read the current cookies so Supabase knows who is signed in.
   const cookieStore = await cookies();
 
+  // Most pages use the public key, but admin tasks need the service key.
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     useServiceRole 
@@ -25,9 +27,7 @@ export async function createClient(useServiceRole = false) {
               cookieStore.set(name, value, options),
             );
           } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have proxy refreshing
-            // user sessions.
+            // This can happen in server code and can be ignored here.
           }
         },
       },

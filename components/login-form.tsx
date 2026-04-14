@@ -21,6 +21,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  // Keep the entered credentials in local state until the person submits them.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +30,7 @@ export function LoginForm({
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Create the browser Supabase client only when a login attempt happens.
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
@@ -40,7 +42,8 @@ export function LoginForm({
       });
       if (error) throw error;
       
-      router.refresh(); // Refresh to update auth state in server components
+      // Refresh server-rendered content so the header and admin links update.
+      router.refresh();
       router.push("/");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");

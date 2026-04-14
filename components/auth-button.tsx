@@ -4,9 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "./logout-button";
 
 export async function AuthButton() {
+  // Check if the user is signed in so we can show the right buttons.
   const supabase = await createClient();
 
-  // You can also use getUser() which will be slower.
+  // This is a faster way to read the current user.
   const { data } = await supabase.auth.getClaims();
 
   const user = data?.claims;

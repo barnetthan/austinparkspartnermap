@@ -13,6 +13,7 @@ export default function Page() {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
+              {/* Tell the user the account was created and what to do next. */}
               <CardTitle className="text-2xl">
                 Thank you for signing up!
               </CardTitle>

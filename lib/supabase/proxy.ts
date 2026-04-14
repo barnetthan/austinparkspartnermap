@@ -2,23 +2,21 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
 
-// Toggle this flag to re-enable login protection for routes.
-// Set to true to require login, false to allow all routes without redirect.
+// Set this to `true` if you want most pages to require a login.
 export const REQUIRE_LOGIN = false;
 
 export async function updateSession(request: NextRequest) {
+  // Start with a normal response so login cookies can be updated.
   let supabaseResponse = NextResponse.next({
     request,
   });
 
-  // If the env vars are not set, skip proxy check. You can remove this
-  // once you setup the project.
+  // If the app is missing settings, let the request continue as usual.
   if (!hasEnvVars) {
     return supabaseResponse;
   }
 
-  // With Fluid compute, don't put this client in a global environment
-  // variable. Always create a new one on each request.
+  // Create a new client for each request.
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
@@ -42,17 +40,13 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // Do not run code between createServerClient and
-  // supabase.auth.getClaims(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
+  // Keep this section simple so sign-in stays working.
 
-  // IMPORTANT: If you remove getClaims() and you use server-side rendering
-  // with the Supabase client, your users may be randomly logged out.
+  // This check helps keep signed-in users logged in.
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  // Login requirement is disabled while REQUIRE_LOGIN is false.
-  // To re-enable in the future, set REQUIRE_LOGIN to true above.
+  // Login protection is off for now.
   if (REQUIRE_LOGIN) {
     if (
       request.nextUrl.pathname !== "/" &&
@@ -61,25 +55,13 @@ export async function updateSession(request: NextRequest) {
       !request.nextUrl.pathname.startsWith("/auth") &&
       !request.nextUrl.pathname.startsWith("/map")
     ) {
-      // no user, potentially respond by redirecting the user to the login page
+      // If nobody is signed in, send them to login.
       const url = request.nextUrl.clone();
       url.pathname = "/auth/login";
       return NextResponse.redirect(url);
     }
   }
 
-  // IMPORTANT: You *must* return the supabaseResponse object as it is.
-  // If you're creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
-
+  // Return the response with the updated cookies.
   return supabaseResponse;
 }

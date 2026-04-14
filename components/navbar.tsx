@@ -7,12 +7,13 @@ import Link from "next/link";
 import { LogoutButton } from "./logout-button";
 
 export function Navbar({ initialUser }: { initialUser: any }) {
+  // Start with the signed-in user from the server, then keep it updated in the browser.
   const [user, setUser] = useState(initialUser);
   const supabase = createClient();
   const pathname = usePathname();
 
   useEffect(() => {
-    // 1. Keep the UI in sync with the actual Supabase session
+    // Watch for login changes so the header stays correct.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
     });
@@ -20,8 +21,7 @@ export function Navbar({ initialUser }: { initialUser: any }) {
     return () => subscription.unsubscribe();
   }, [supabase]);
 
-  // 2. MODIFIED: Only hide the navbar on specific auth pages if you want 
-  // (e.g., maybe hide it only on the "Update Password" page but keep it on "Login")
+  // Hide the navbar on the password reset page to keep that screen simple.
   if (pathname === "/auth/update-password") return null;
 
   return (
@@ -41,7 +41,7 @@ export function Navbar({ initialUser }: { initialUser: any }) {
       >
         <Link href="/">Home</Link>
         
-        {/* If they are logged in, show the Admin link even on the Login page! */}
+        {/* Signed-in users get a link to the admin area. */}
         {user && <Link href="/admin/admins">Admin</Link>}
 
         <div style={{ marginLeft: "auto" }} />
@@ -52,7 +52,7 @@ export function Navbar({ initialUser }: { initialUser: any }) {
             <LogoutButton />
           </div>
         ) : (
-          /* Only show the Login link if they aren't already on the login page */
+          // Only show the login link when the user is not already on that page.
           pathname !== "/auth/login" && <Link href="/auth/login">Login</Link>
         )}
       </nav>

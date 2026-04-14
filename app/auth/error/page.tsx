@@ -6,6 +6,7 @@ async function ErrorContent({
 }: {
   searchParams: Promise<{ error: string }>;
 }) {
+  // Read the error message from the URL.
   const params = await searchParams;
 
   return (
@@ -39,6 +40,7 @@ export default function Page({
               </CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Show the error message here. */}
               <Suspense>
                 <ErrorContent searchParams={searchParams} />
               </Suspense>

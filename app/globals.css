@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Light theme colors used across the site. */
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -30,6 +31,7 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+  /* Dark theme colors used when dark mode is turned on. */
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -58,6 +60,7 @@
   }
 }
 
+/* Apply the shared color settings to all elements and the page background. */
 @layer base {
   * {
     @apply border-border;
@@ -66,4 +69,3 @@
     @apply bg-background text-foreground;
   }
 }
-

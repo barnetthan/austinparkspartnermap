@@ -5,6 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 export function SignUpUserSteps() {
   return (
     <ol className="flex flex-col gap-6">
+      {/* When the app is live online, the links must match the real website. */}
       {process.env.VERCEL_ENV === "preview" ||
       process.env.VERCEL_ENV === "production" ? (
         <TutorialStep title="Set up redirect urls">

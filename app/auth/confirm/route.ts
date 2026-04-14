@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get("next") ?? "/";
 
   if (token_hash && type) {
+    // Check the one-time email code.
     const supabase = await createClient();
 
     const { error } = await supabase.auth.verifyOtp({
@@ -17,14 +18,14 @@ export async function GET(request: NextRequest) {
       token_hash,
     });
     if (!error) {
-      // redirect user to specified redirect URL or root of app
+      // If it works, send the user to the next page.
       redirect(next);
     } else {
-      // redirect the user to an error page with some instructions
+      // If it fails, show an error page with the reason.
       redirect(`/auth/error?error=${error?.message}`);
     }
   }
 
-  // redirect the user to an error page with some instructions
+  // If the code is missing, the link is probably bad or expired.
   redirect(`/auth/error?error=No token hash or type`);
 }

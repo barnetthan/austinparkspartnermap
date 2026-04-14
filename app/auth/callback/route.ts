@@ -4,12 +4,12 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  // This tells Supabase where to send the user AFTER the code is exchanged
+  // After the email link is clicked, continue to password setup.
   const next = searchParams.get('next') ?? '/auth/update-password'
 
   if (code) {
     const supabase = await createClient()
-    // This is the "Magic" line that creates the session
+    // Turn the temporary code into a normal login session.
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     
     if (!error) {
@@ -17,6 +17,6 @@ export async function GET(request: Request) {
     }
   }
 
-  // Return the user to an error page with instructions
+  // If the code is missing or bad, send the user back to login.
   return NextResponse.redirect(`${origin}/auth/login?error=auth-code-error`)
 }

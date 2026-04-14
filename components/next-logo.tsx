@@ -1,5 +1,6 @@
 export function NextLogo() {
   return (
+    // Simple Next.js logo used in the starter template.
     <svg
       aria-label="Next.js logotype"
       height="68"

@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 export function EnvVarWarning() {
   return (
     <div className="flex gap-4 items-center">
+      {/* This warning appears when Supabase settings are missing. */}
       <Badge variant={"outline"} className="font-normal">
         Supabase environment variables required
       </Badge>

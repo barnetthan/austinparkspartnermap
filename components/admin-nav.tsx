@@ -10,6 +10,7 @@ const tabs = [
 ];
 
 export function AdminNav() {
+  // Highlight the current section so staff know where they are in the portal.
   const pathname = usePathname();
 
   return (

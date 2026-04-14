@@ -18,6 +18,7 @@ type PartnerRow = {
 type Status = { ok: boolean; message: string } | null;
 
 export default function AdminPartnersPage() {
+  // Keep one browser client for this page.
   const supabase = useMemo(() => createClient(), []);
   const [partners, setPartners] = useState<PartnerRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +32,7 @@ export default function AdminPartnersPage() {
   const [longitude, setLongitude] = useState("");
   const [partnerToDelete, setPartnerToDelete] = useState<PartnerRow | null>(null);
 
+  // Clear the form so it is ready for a new partner.
   const resetForm = () => {
     setEditingId(null);
     setName("");
@@ -39,6 +41,7 @@ export default function AdminPartnersPage() {
     setLongitude("");
   };
 
+  // These values stop the up/down buttons at the top and bottom.
   const minOrder = partners.length > 0 
     ? Math.min(...partners.map(p => p.display_order ?? 0)) 
     : 0;
@@ -47,6 +50,7 @@ export default function AdminPartnersPage() {
     ? Math.max(...partners.map(p => p.display_order ?? 0)) 
     : 0;
 
+  // Load the partner list and keep it sorted.
   const loadPartners = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -64,6 +68,7 @@ export default function AdminPartnersPage() {
     setLoading(false);
   };
 
+  // Swap two partners so their order changes.
   const movePartner = async (currentIndex: number, direction: 'up' | 'down') => {
     const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
     if (targetIndex < 0 || targetIndex >= partners.length) return;
@@ -97,10 +102,12 @@ export default function AdminPartnersPage() {
   };
 
   useEffect(() => {
+    // Load the list when the page opens.
     loadPartners();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Check that the coordinates are real numbers.
   const parseCoordinate = (value: string, type: "latitude" | "longitude") => {
     if (!value.trim()) return null;
     const parsed = Number.parseFloat(value.trim());
@@ -119,6 +126,7 @@ export default function AdminPartnersPage() {
     setPending(true);
     setStatus(null);
 
+    // A partner name is required.
     if (!name.trim()) {
       setStatus({ ok: false, message: "name is required" });
       setPending(false);
@@ -137,9 +145,11 @@ export default function AdminPartnersPage() {
       setPending(false);
       return;
     }
+    // New partners are added to the end of the list.
     const nextOrder = partners.length > 0 
       ? Math.max(...partners.map(p => p.display_order ?? 0)) + 1 : 0;
 
+    // Put the form values into one object for saving.
     const payload = {
       name: name.trim(),
       description: description.trim() || null,
@@ -148,6 +158,7 @@ export default function AdminPartnersPage() {
       display_order: nextOrder,
     };
 
+    // Save as a new partner or update the current one.
     const query = editingId
       ? supabase.from("partners").update(payload).eq("id", editingId)
       : supabase.from("partners").insert([payload]);
@@ -172,6 +183,7 @@ export default function AdminPartnersPage() {
   };
 
   const onEdit = (partner: PartnerRow) => {
+    // Put the chosen partner into the form so it can be edited.
     setEditingId(partner.id);
     setName(partner.name ?? "");
     setDescription(partner.description ?? "");
@@ -185,6 +197,7 @@ export default function AdminPartnersPage() {
   };
 
   const onDelete = async (partnerId: string | number, partnerName?: string | null) => {
+    // Delete the partner and reload the list.
     setPending(true);
     setStatus(null);
     const { error } = await supabase.from("partners").delete().eq("id", partnerId);
@@ -211,6 +224,7 @@ export default function AdminPartnersPage() {
         </p>
       </div>
 
+      {/* Form for adding or editing a partner. */}
       <form onSubmit={onSubmit} className="space-y-4 rounded-lg border p-4">
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">

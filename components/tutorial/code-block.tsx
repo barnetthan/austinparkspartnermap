@@ -37,6 +37,7 @@ const CheckIcon = () => (
 );
 
 export function CodeBlock({ code }: { code: string }) {
+  // Change the button icon for a moment after copying.
   const [icon, setIcon] = useState(CopyIcon);
 
   const copy = async () => {

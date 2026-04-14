@@ -14,21 +14,25 @@ type PartnerLocation = {
 const defaultCenter: [number, number] = [30.2672, -97.7431];
 
 export default function HomeMap({ partners }: { partners: PartnerLocation[] }) {
+  // Remember which partner the user clicked.
   const [selectedId, setSelectedId] = useState<string | null>(
     partners[0]?.id ?? null,
   );
 
+  // Find the clicked partner so the map can focus on it.
   const selectedPartner = useMemo(
     () => partners.find((p) => p.id === selectedId) ?? null,
     [partners, selectedId],
   );
 
+  // If nothing is picked yet, show the first partner or Austin.
   const center: [number, number] = selectedPartner
     ? [selectedPartner.latitude, selectedPartner.longitude]
     : partners.length > 0
       ? [partners[0].latitude, partners[0].longitude]
       : defaultCenter;
 
+  // Use a simple Google Maps embed to show the location.
   const mapSrc = `https://maps.google.com/maps?q=${center[0]},${center[1]}&z=13&output=embed`;
 
   return (
@@ -44,6 +48,7 @@ export default function HomeMap({ partners }: { partners: PartnerLocation[] }) {
       </div>
 
       <div className="rounded-xl border bg-muted/20 p-3">
+        {/* The list lets the user choose which partner the map shows. */}
         <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-[#0a2b52]">
           Partners
         </h3>

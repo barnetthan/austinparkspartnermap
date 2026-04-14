@@ -5,6 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
+// Password field that lets the user show or hide what they typed.
 type PasswordInputProps = Omit<
   React.ComponentProps<typeof Input>,
   "type"
