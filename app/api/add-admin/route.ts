@@ -42,8 +42,9 @@ export async function POST(req: Request) {
       message: 'Invitation sent successfully.' 
     })
 
-  } catch (error: any) {
-    console.error("Admin Invitation Error:", error.message)
-    return NextResponse.json({ error: error.message }, { status: 400 })
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred'
+    console.error("Admin Invitation Error:", errorMessage)
+    return NextResponse.json({ error: errorMessage }, { status: 400 })
   }
 }

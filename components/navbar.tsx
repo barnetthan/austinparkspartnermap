@@ -6,8 +6,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { LogoutButton } from "./logout-button";
 
-export function Navbar({ initialUser }: { initialUser: any }) {
-  // Start with the signed-in user from the server, then keep it updated in the browser.
+export function Navbar({ initialUser }: { initialUser: { email?: string } | null }) {
   const [user, setUser] = useState(initialUser);
   const supabase = createClient();
   const pathname = usePathname();

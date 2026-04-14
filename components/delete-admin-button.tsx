@@ -37,11 +37,12 @@ export function DeleteAdminButton({
       });
       setShowConfirm(false);
       router.refresh();
-    } catch (err: any) {
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to remove admin.'
       setShowConfirm(false);
       onStatusChange({
         ok: false,
-        message: err.message || "Failed to remove admin.",
+        message: errorMessage,
       });
     } finally {
       setIsRemoving(false);
@@ -63,7 +64,7 @@ export function DeleteAdminButton({
           <div className="w-full max-w-md rounded-lg border bg-background p-6 shadow-lg">
             <h3 className="text-lg font-semibold">Remove admin?</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Are you sure you want to remove "{email}" as an admin? This will
+              Are you sure you want to remove &quot;{email}&quot; as an admin? This will
               revoke their access immediately.
             </p>
             <div className="mt-4 flex justify-end gap-2">

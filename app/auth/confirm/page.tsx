@@ -8,8 +8,7 @@ export default function ConfirmAccount() {
   const [password, setPassword] = useState("");
   const supabase = createClient(); 
   
-  const handleSetPassword = async (e: React.FormEvent) => {
-    // Save the new password for the current login session.
+  const handleSetPassword = async () => {
     const { error } = await supabase.auth.updateUser({ password });
     
     if (error) alert(error.message);
